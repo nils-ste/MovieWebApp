@@ -19,15 +19,18 @@ def index():
     users = data_manager.get_users()
     return render_template('index.html', users=users)
 
+
 @app.route('/users')
 def list_users():
     users = data_manager.get_users()
     return str(users)  # Temporarily returning users as a string
 
+
 @app.route('/users', methods=['POST'])
 def new_user():
     user = data_manager.create_user(request.form['name'])
     return redirect(url_for('index'))
+
 
 @app.route('/users/<int:user_id>/movies', methods=['GET'])
 def list_movies(user_id):
@@ -42,22 +45,26 @@ def new_movie(user_id):
     data_manager.add_movie(user_id, title)
     return redirect(url_for('list_movies', user_id=user_id))
 
+
 @app.route('/users/<int:user_id>/movies/<int:movie_id>/update', methods=['POST'])
-def update_movie(user_id,movie_id):
+def update_movie(user_id, movie_id):
     new_title = request.form['title']
     data_manager.update_movie(movie_id, new_title)
     return redirect(url_for('list_movies', user_id=user_id))
 
+
 @app.route('/users/<int:user_id>/movies/<int:movie_id>/delete', methods=['POST'])
-def delete_movie(user_id,movie_id):
+def delete_movie(user_id, movie_id):
     data_manager.delete_movie(movie_id)
     return redirect(url_for('list_movies', user_id=user_id))
 
-
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.hmtl'), 404
 
 
 if __name__ == '__main__':
-  with app.app_context():
-    db.create_all()
+    with app.app_context():
+        db.create_all()
 
-  app.run()
+    app.run()
