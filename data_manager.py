@@ -13,7 +13,7 @@ class DataManager():
         return User.query.all()
     def get_movies(self, user_id):
         return Movie.query.filter_by(user_id=user_id).all()
-    def add_movie(self, movie, user_id):
+    def add_movie(self, user_id, title):
         try:
             url = f"{api_url}&t={title}"
             response = requests.get(url)
@@ -21,9 +21,12 @@ class DataManager():
                 return
             data = response.json()
 
-            year = int(data.get("Year", 0) or 0)
+            year_str = (data.get("Year") or "0")
+            # Simple parse; adjust if Year contains ranges like "2017–"
+            year = int(''.join(ch for ch in year_str if ch.isdigit()) or 0)
+
             rating_str = data.get("imdbRating") or "0"
-            rating = float(rating_str)  # your model uses Integer
+            rating = float(rating_str)
 
             poster = data.get("Poster") or ""
             director = data.get("Director") or ""
@@ -42,8 +45,16 @@ class DataManager():
             print("We can't find this movie in the imDB Database, please try again later")
 
     def update_movie(self, movie_id, new_title):
-        pass
+        movie = Movie.query.get(movie_id)
+        if not movie:
+            return None
+        movie.title = new_title
+        db.session.commit()
+        return movie
+
     def delete_movie(self, movie_id):
-        pass
+        db.session.query(Movie).filter_by(id=movie_id).delete()
+        db.session.commit()
+
 
 

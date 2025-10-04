@@ -38,17 +38,20 @@ def list_movies(user_id):
 
 @app.route('/users/<int:user_id>/movies', methods=['POST'])
 def new_movie(user_id):
-    title = request.form['title']
+    title = request.form['movie_title']
     data_manager.add_movie(user_id, title)
     return redirect(url_for('list_movies', user_id=user_id))
 
 @app.route('/users/<int:user_id>/movies/<int:movie_id>/update', methods=['POST'])
 def update_movie(user_id,movie_id):
-    pass
+    new_title = request.form['title']
+    data_manager.update_movie(movie_id, new_title)
+    return redirect(url_for('list_movies', user_id=user_id))
 
 @app.route('/users/<int:user_id>/movies/<int:movie_id>/delete', methods=['POST'])
 def delete_movie(user_id,movie_id):
-    pass
+    data_manager.delete_movie(movie_id)
+    return redirect(url_for('list_movies', user_id=user_id))
 
 
 
